@@ -8,7 +8,8 @@ from fetch import counties
 
 
 def daily(df):
-    return df.sort_values('date').set_index('date')['cases'].diff().fillna(0)
+    new = df.sort_values('date').set_index('date')['cases'].diff().fillna(0)
+    return new.clip(lower=0)
 
 
 def main():
