@@ -12,6 +12,10 @@ def daily(df):
     return new.clip(lower=0)
 
 
+def smooth(s):
+    return s.rolling(7, min_periods=1).mean()
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--state', required=True)
@@ -22,6 +26,7 @@ def main():
     c = df[(df.state == args.state) & (df.county == args.county)]
     plt.plot(c.date, c.cases)
     new = daily(c)
+    new = smooth(new)
     plt.plot(new.index, new)
     plt.title(args.state)
     plt.ylabel('new cases (7 day mean)')
