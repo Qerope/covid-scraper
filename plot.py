@@ -1,5 +1,6 @@
 import argparse
 
+import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -16,10 +17,17 @@ def smooth(s):
     return s.rolling(7, min_periods=1).mean()
 
 
+def population(state, county):
+    pop = pd.read_csv('data/population.csv')
+    row = pop[(pop.state == state) & (pop.county == county)]
+    return int(row.population.iloc[0])
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--state', required=True)
     ap.add_argument('--county', required=True)
+    ap.add_argument('--per-100k', action='store_true')
     args = ap.parse_args()
 
     df = counties()
@@ -27,6 +35,8 @@ def main():
     plt.plot(c.date, c.cases)
     new = daily(c)
     new = smooth(new)
+        if args.per_100k:
+            new = new / population(args.state, name) * 100000
     plt.plot(new.index, new)
     plt.title(args.state)
     plt.ylabel('new cases (7 day mean)')
