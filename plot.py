@@ -26,18 +26,19 @@ def population(state, county):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--state', required=True)
-    ap.add_argument('--county', required=True)
+    ap.add_argument('--counties', nargs='+', required=True)
     ap.add_argument('--per-100k', action='store_true')
     args = ap.parse_args()
 
     df = counties()
-    c = df[(df.state == args.state) & (df.county == args.county)]
-    plt.plot(c.date, c.cases)
-    new = daily(c)
-    new = smooth(new)
+    for name in args.counties:
+        c = df[(df.state == args.state) & (df.county == name)]
+        new = daily(c)
+        new = smooth(new)
         if args.per_100k:
             new = new / population(args.state, name) * 100000
-    plt.plot(new.index, new)
+        plt.plot(new.index, new, label=name)
+    plt.legend()
     plt.title(args.state)
     plt.ylabel('new cases (7 day mean)')
     plt.gcf().autofmt_xdate()
