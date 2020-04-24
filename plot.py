@@ -23,6 +23,13 @@ def population(state, county):
     return int(row.population.iloc[0])
 
 
+def select(df, state, county):
+    # the NYT file reports the five boroughs as "New York City"
+    if state == 'New York' and county in ('Kings', 'Queens', 'Bronx', 'Richmond', 'New York'):
+        county = 'New York City'
+    return df[(df.state == state) & (df.county == county)], county
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--state', required=True)
@@ -32,7 +39,7 @@ def main():
 
     df = counties()
     for name in args.counties:
-        c = df[(df.state == args.state) & (df.county == name)]
+        c, name = select(df, args.state, name)
         new = daily(c)
         new = smooth(new)
         if args.per_100k:
