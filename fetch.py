@@ -25,3 +25,9 @@ def counties():
     with open(CACHE, 'wb') as f:
         f.write(r.content)
     return pd.read_csv(io.StringIO(r.text), parse_dates=['date'])
+
+
+def vaccinations():
+    r = requests.get('https://data.cdc.gov/resource/8xkx-amqh.csv?$limit=500000', timeout=60)
+    r.raise_for_status()
+    return pd.read_csv(io.StringIO(r.text), parse_dates=['date'])
